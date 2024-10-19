@@ -19,7 +19,5 @@ class AutoresRepository(private val autoresDao: AutoresDao) {
     suspend fun actualizar(autor: Autores) {
         autoresDao.updateAutor(autor)
     }
-    suspend fun getAutorById(autorId: Int): Autores? {
-        return autoresDao.getAutorById(autorId)
-    }
+
 }

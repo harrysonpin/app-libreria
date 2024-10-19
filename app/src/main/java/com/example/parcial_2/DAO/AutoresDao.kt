@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.parcial_2.Model.Autores
-import com.example.parcial_2.Model.Prestamos
 
 @Dao
 interface AutoresDao {

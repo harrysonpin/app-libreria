@@ -27,6 +27,7 @@ fun DetalleAutorScreen(
     val scope = rememberCoroutineScope()
     var libros by remember { mutableStateOf(listOf<Libros>()) }
     var showAddDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf<Libros?>(null) }
 
     LaunchedEffect(authorId) {
         libros = withContext(Dispatchers.IO) { librosRepository.getLibrosByAutor(authorId) }
@@ -72,6 +73,9 @@ fun DetalleAutorScreen(
                                 libros = librosRepository.getLibrosByAutor(authorId)
                             }
                         }
+                    },
+                    onEdit = { libroToEdit ->
+                        showEditDialog = libroToEdit
                     }
                 )
             }
@@ -93,11 +97,26 @@ fun DetalleAutorScreen(
             }
         )
     }
+
+    showEditDialog?.let { libro ->
+        EditarLibroDialog(
+            libro = libro,
+            onDismiss = { showEditDialog = null },
+            onEdit = { libroEditado ->
+                scope.launch {
+                    withContext(Dispatchers.IO) {
+                        librosRepository.updateLibro(libroEditado)
+                        libros = librosRepository.getLibrosByAutor(authorId)
+                    }
+                    showEditDialog = null
+                }
+            }
+        )
+    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LibroCard(libro: Libros, onDelete: () -> Unit) {
+fun LibroCard(libro: Libros, onDelete: () -> Unit, onEdit: (Libros) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -122,10 +141,12 @@ fun LibroCard(libro: Libros, onDelete: () -> Unit) {
             IconButton(onClick = onDelete) {
                 Icon(Icons.Default.Delete, contentDescription = "Eliminar Libro")
             }
+            IconButton(onClick = { onEdit(libro) }) {
+                Icon(Icons.Default.Edit, contentDescription = "Editar Libro")
+            }
         }
     }
 }
-
 @Composable
 fun AgregarLibroDialog(
     authorId: Int,
@@ -162,6 +183,51 @@ fun AgregarLibroDialog(
                 }
             }) {
                 Text("Agregar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
+}
+@Composable
+fun EditarLibroDialog(
+    libro: Libros,
+    onDismiss: () -> Unit,
+    onEdit: (Libros) -> Unit
+) {
+    var titulo by remember { mutableStateOf(libro.titulo) }
+    var genero by remember { mutableStateOf(libro.genero) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Editar Libro") },
+        text = {
+            Column {
+                TextField(
+                    value = titulo,
+                    onValueChange = { titulo = it },
+                    label = { Text("Título") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(
+                    value = genero,
+                    onValueChange = { genero = it },
+                    label = { Text("Género") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                if (titulo.isNotBlank() && genero.isNotBlank()) {
+                    onEdit(libro.copy(titulo = titulo, genero = genero))
+                }
+            }) {
+                Text("Guardar")
             }
         },
         dismissButton = {

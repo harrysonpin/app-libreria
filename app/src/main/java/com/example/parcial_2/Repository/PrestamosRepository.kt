@@ -8,10 +8,6 @@ class PrestamosRepository(private val prestamosDao: PrestamosDao) {
         prestamosDao.insert(prestamo)
     }
 
-    suspend fun getAllPrestamos(): List<Prestamos> {
-        return prestamosDao.getAllPrestamos()
-    }
-
     suspend fun eliminar(prestamo: Prestamos) {
         prestamosDao.deletePrestamo(prestamo)
     }

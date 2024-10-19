@@ -16,13 +16,13 @@ class LibrosRepository(private val librosDao: LibrosDao) {
         librosDao.deleteLibro(libro)
     }
 
-    suspend fun actualizar(libro: Libros) {
-        librosDao.updateLibro(libro)
-    }
     suspend fun getLibrosByAutor(autorId: Int): List<Libros> {
         return librosDao.getLibrosByAutor(autorId)
     }
     suspend fun getLibroById(libroId: Int): Libros? {
         return librosDao.getLibroById(libroId)
+    }
+    suspend fun updateLibro(libro: Libros) {
+        librosDao.updateLibro(libro)
     }
 }

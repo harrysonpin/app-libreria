@@ -15,8 +15,6 @@ interface PrestamosDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE) //Revisión de conflictos entre registros
     suspend fun insert (prestamo: Prestamos)
 
-    @Query("SELECT * FROM prestamos")
-    suspend fun getAllPrestamos(): List<Prestamos>
 
     @Query("SELECT * FROM prestamos WHERE libro_id = :libroId")
     suspend fun getPrestamosByLibro(libroId: Int): List<Prestamos>
